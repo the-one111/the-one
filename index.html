@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>THE ONE</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+        .header { margin-top: 50px; text-align: center; letter-spacing: 10px; font-weight: bold; }
+        
+        #input-field {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #fff;
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+            width: 80%;
+            outline: none;
+            text-transform: uppercase;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        #ledger {
+            width: 90%;
+            margin-top: 40px;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-bottom: 20px;
+        }
+
+        .observation-entry {
+            border-left: 2px solid #fff;
+            padding-left: 15px;
+            margin-bottom: 25px;
+            animation: emerge 0.8s ease-out;
+        }
+
+        .timestamp { font-size: 0.6rem; color: #444; display: block; margin-bottom: 5px; }
+        .text { font-size: 1.1rem; line-height: 1.4; letter-spacing: 1px; }
+
+        @keyframes emerge {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">THE ONE</div>
+    
+    <input type="text" id="input-field" placeholder="STATE THE OBSERVATION" autofocus>
+    
+    <div id="ledger"></div>
+
+    <script>
+        const input = document.getElementById('input-field');
+        const ledger = document.getElementById('ledger');
+
+        const loadLedger = () => {
+            const history = JSON.parse(localStorage.getItem('the_one_evolution') || "[]");
+            ledger.innerHTML = history.reverse().map(entry => `
+                <div class="observation-entry">
+                    <span class="timestamp">${new Date(entry.time).toLocaleString()}</span>
+                    <span class="text">${entry.msg}</span>
+                </div>
+            `).join('');
+        };
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== "") {
+                const history = JSON.parse(localStorage.getItem('the_one_evolution') || "[]");
+                history.push({
+                    msg: input.value.toUpperCase(),
+                    time: Date.now()
+                });
+                localStorage.setItem('the_one_evolution', JSON.stringify(history));
+                input.value = "";
+                loadLedger();
+            }
+        });
+
+        loadLedger();
+    </script>
+</body>
+</html>
